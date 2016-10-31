@@ -1,0 +1,88 @@
+{
+    "srcDir": "../jquery-src/",
+    "distDir": "../dist/",
+    "indexFile": "index.js",
+    "include": ["^jquery[\\.]calendars.*[\\.]js$"],
+    "exclude": [
+        "[\\.]min[\\.]js$",
+        "picker",
+        "validation",
+        "plugin",
+        "[\\.]all[\\.]js$",
+        "[\\.]lang[\\.]js$"
+    ],
+    "subdirectories": ["calendars", "regional"],
+    "outputOrder": [
+        {
+            "match": "^(jquery[\\.]calendars[\\.]js)$",
+            "out": "main",
+            "export": true
+        },
+        {
+            "match": "^(jquery[\\.]calendars[\\.]plus[\\.]js)$",
+            "out": "plus"
+        },
+        {
+            "match": "^(jquery[\\.]calendars[\\.]([^\\.]+)[\\.]js)$",
+            "out": "calendars/$2"
+        },
+        {
+            "match": "^(jquery[\\.]calendars-([^\\.]+)[\\.]js)$",
+            "out": "regional/$2"
+        }
+    ],
+    "unwrap": {
+        "start": "^\\s*\\(\\s*function\\s*\\(\\s*\\$\\s*\\)\\s*\\{\\s*(\\/\\/.*)?$",
+        "end": "^\\s*}\\s*\\)\\s*\\(\\s*jQuery\\s*\\);\\s*(\\/\\/.*)?$"
+    },
+    "newLine": "\n",
+    "translate": [
+        {
+            "from": "$.calendars.calendars.gregorian",
+            "to": "_gregorian",
+            "setup": [
+                "var main = require('../main');",
+                "var _gregorian = main.calendars.gregorian;"
+            ],
+            "exclude": "^(main|plus)$"
+        },
+        {
+            "from": "$.calendars.calendars.julian",
+            "to": "_julian",
+            "setup": [
+                "var main = require('../main');",
+                "var _julian = main.calendars.julian;"
+            ],
+            "exclude": "^(main|plus|calendars\\/julian)$"
+        },
+        {
+            "from": "$.calendars",
+            "to": "main",
+            "setup": ["var main = require('../main');"],
+            "exclude": "^(main|plus)$"
+        },
+        {
+            "from": "$.calendars",
+            "to": "_exports",
+            "setup": [],
+            "include": "^main$"
+        },
+        {
+            "from": "_exports = ",
+            "to": "var _exports = module.exports = ",
+            "setup": [],
+            "include": "^main$"
+        },
+        {
+            "from": "$.extend",
+            "to": "assign",
+            "setup": ["var assign = require('object-assign');"]
+        },
+        {
+            "from": "$.calendars",
+            "to": "main",
+            "setup": ["var main = require('./main');"],
+            "include": "^plus$"
+        }
+    ]
+}
