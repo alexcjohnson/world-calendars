@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "clean": "cd dist && ls | grep -v README.md | xargs rm -rf",
-    "build": "cd bin && node ./build.js",
+    "build": "node bin/build.js",
     "start": "npm run clean && npm run build",
     "test": "karma start test/karma.conf.js"
   },

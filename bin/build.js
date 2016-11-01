@@ -5,13 +5,13 @@ function toRegExp(s) { return new RegExp(s); }
 /*
  * Config options
  */
-var config = JSON.parse(fs.readFileSync('./config.json', 'utf8')),
+var config = JSON.parse(fs.readFileSync(__dirname + '/config.json', 'utf8')),
 
     // string: dir of source files, relative to 'bin'
-    srcDir = config.srcDir,
+    srcDir = __dirname + '/' + config.srcDir,
 
     // string: dir to put built files into, relative to 'bin'
-    distDir = config.distDir,
+    distDir = __dirname + '/' + config.distDir,
 
     // array[string]: subdirectories to create in dist
     subdirectories = config.subdirectories,
@@ -207,7 +207,7 @@ subdirectories.forEach(function(subdir) {
 
 var srcFiles = fs.readdirSync(srcDir).filter(srcInclude).sort(srcSort);
 
-var headComment = fs.readFileSync('./head-comment.js', 'utf8');
+var headComment = fs.readFileSync(__dirname + '/head-comment.js', 'utf8');
 
 var indexLines = [];
 
