@@ -305,7 +305,29 @@
                 lunar.year, lunar.month, lunar.isIntercalary);
             return this.newDate(lunar.year, monthIndex, lunar.day);
         },
+
+        /** Create a new date from a string.
+            @memberof ChineseCalendar
+            @param dateString {string} String representing a Chinese date
+            @return {CDate} The new date.
+            @throws Error if an invalid date. */
+        fromString: function(dateString) {
+            var match = dateString.match(DATE_REGEXP);
+
+            var year = this._validateYear(+match[1]);
+
+            var month = +match[2];
+            var isIntercalary = !!match[3];
+            var monthIndex = this.toMonthIndex(year, month, isIntercalary);
+
+            var day = +match[4];
+
+            return this.newDate(year, monthIndex, day);
+        },
     });
+
+    // Used by ChineseCalendar.prototype.fromString
+    var DATE_REGEXP = /^\s*(-?\d\d\d\d|\d\d)[-/](\d?\d)([i|I]?)[-/](\d?\d)/m;
 
     // Chinese calendar implementation
     $.calendars.calendars.chinese = ChineseCalendar;
