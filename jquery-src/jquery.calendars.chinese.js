@@ -522,8 +522,8 @@
         var chineseNewYearJSDate = new Date(y, m -1, d);
         var jsDate = new Date(solarDate.year, solarDate.month - 1, solarDate.day);
 
-        daysFromNewYear = Math.round(jsDate - chineseNewYearJSDate) /
-            (24 * 3600 * 1000);
+        daysFromNewYear = Math.round(
+            (jsDate - chineseNewYearJSDate) / (24 * 3600 * 1000));
 
         // Compute lunar month and day
         var monthDaysTable = LUNAR_MONTH_DAYS[lunarDate.year - LUNAR_MONTH_DAYS[0]];
