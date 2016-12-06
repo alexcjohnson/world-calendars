@@ -1043,6 +1043,7 @@
 			settings = settings || {};
 			var dayNamesShort = settings.dayNamesShort || this.local.dayNamesShort;
 			var dayNames = settings.dayNames || this.local.dayNames;
+			var monthNumbers = settings.monthNumbers || this.local.monthNumbers;
 			var monthNamesShort = settings.monthNamesShort || this.local.monthNamesShort;
 			var monthNames = settings.monthNames || this.local.monthNames;
 			var calculateWeek = settings.calculateWeek || this.local.calculateWeek;
@@ -1069,6 +1070,25 @@
 			var formatName = function(match, value, shortNames, longNames) {
 				return (doubled(match) ? longNames[value] : shortNames[value]);
 			};
+			// Format month number
+			// (e.g. Chinese calendar needs to account for intercalary months)
+			var formatMonth = function(date) {
+				return (typeof monthNumbers === 'function') ?
+					monthNumbers(date, doubled('m')) :
+					localiseNumbers(formatNumber('m', date.month(), 2));
+			};
+			// Format a month name, short or long as requested
+			var formatMonthName = function(date, useLongName) {
+				if (useLongName) {
+					return (typeof monthNames === 'function') ?
+						monthNames(date) :
+						monthNames[date.month() - this.minMonth];
+				} else {
+					return (typeof monthNamesShort === 'function') ?
+						monthNamesShort(date) :
+						monthNamesShort[date.month() - this.minMonth];
+				}
+			};
 			// Localise numbers if requested and available
 			var digits = this.local.digits;
 			var localiseNumbers = function(value) {
@@ -1092,9 +1112,8 @@
 							dayNamesShort, dayNames); break;
 						case 'o': output += formatNumber('o', date.dayOfYear(), 3); break;
 						case 'w': output += formatNumber('w', date.weekOfYear(), 2); break;
-						case 'm': output += localiseNumbers(formatNumber('m', date.month(), 2)); break;
-						case 'M': output += formatName('M', date.month() - this.minMonth,
-							monthNamesShort, monthNames); break;
+						case 'm': output += formatMonth(date); break;
+						case 'M': output += formatMonthName(date, doubled('M')); break;
 						case 'y':
 							output += (doubled('y', 2) ? date.year() :
 								(date.year() % 100 < 10 ? '0' : '') + date.year() % 100);
