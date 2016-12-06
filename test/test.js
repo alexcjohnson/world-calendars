@@ -102,7 +102,10 @@ describe('World calendars', function() {
             nepali: [[2073, 7, 15]],
             nanakshahi: [[548, 8, 17]],
             mayan: [[5203, 16, 10]],
-            discworld: [[1841, 9, 28]]
+            discworld: [[1841, 9, 28]],
+            // In order to handle intercalary months,
+            // the Chinese calendar uses month indices starting from 0
+            chinese: [[2016, 10 - 1, 1]]
         };
 
         var mayanYears = ['13.0.3'];
@@ -136,4 +139,44 @@ describe('World calendars', function() {
     });
 
     // TODO: test localizations?
+});
+
+describe('Chinese calendar', function() {
+    var chineseCalendar;
+    var gregorianCalendar;
+    var testCases;
+
+    chineseCalendar = calendars.instance("Chinese");
+
+    gregorianCalendar = calendars.instance();
+
+    testCases = [{
+        chinese: "2016/11/07",
+        gregorian: { year: 2016, month: 12, day: 5 },
+    }, {
+        chinese: "2014/11/25",
+        gregorian: { year: 2015, month: 1, day: 15 },
+    }, {
+        chinese: "2014/9i/02",
+        gregorian: { year: 2014, month: 10, day: 25 },
+    }];
+
+    it('should convert to and from Gregorian calendar', function() {
+        testCases.forEach(function(testCase) {
+            var chineseDate = chineseCalendar.fromString(testCase.chinese);
+
+            var gregorianDate = gregorianCalendar.newDate(
+                testCase.gregorian.year,
+                testCase.gregorian.month,
+                testCase.gregorian.day);
+            expect(gregorianDate.year()).toEqual(testCase.gregorian.year);
+            expect(gregorianDate.month()).toEqual(testCase.gregorian.month);
+            expect(gregorianDate.day()).toEqual(testCase.gregorian.day);
+
+            expect(chineseDate.toJD()).toEqual(gregorianDate.toJD());
+
+            expect(chineseDate.formatDate()).toEqual(testCase.chinese);
+            expect(chineseCalendar.fromJD(gregorianDate.toJD()).formatDate()).toEqual(testCase.chinese);
+        });
+    });
 });
