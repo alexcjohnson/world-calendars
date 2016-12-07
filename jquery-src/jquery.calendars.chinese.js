@@ -60,6 +60,11 @@
                 name: 'Chinese',
                 epochs: ['BEC', 'EC'],
                 monthNumbers: function(date, padded) {
+                    if (typeof date === 'string') {
+                        var match = date.match(MONTH_NUMBER_REGEXP);
+                        return (match) ? match[0] : '';
+                    }
+
                     var year = ChineseCalendar.prototype._validateYear(date);
                     var monthIndex = date.month();
 
@@ -79,6 +84,11 @@
                     return month;
                 },
                 monthNames: function(date) {
+                    if (typeof date === 'string') {
+                        var match = date.match(MONTH_NAME_REGEXP);
+                        return (match) ? match[0] : '';
+                    }
+
                     var year = ChineseCalendar.prototype._validateYear(date);
                     var monthIndex = date.month();
 
@@ -97,6 +107,11 @@
                     return monthName;
                 },
                 monthNamesShort: function(date) {
+                    if (typeof date === 'string') {
+                        var match = date.match(MONTH_SHORT_NAME_REGEXP);
+                        return (match) ? match[0] : '';
+                    }
+
                     var year = ChineseCalendar.prototype._validateYear(date);
                     var monthIndex = date.month();
 
@@ -113,6 +128,31 @@
                     }
 
                     return monthName;
+                },
+                parseMonth: function(year, monthString) {
+                    year = ChineseCalendar.prototype._validateYear(year);
+                    var month = parseInt(monthString);
+                    var isIntercalary;
+
+                    if (!isNaN(month)) {
+                        var i = monthString[monthString.length - 1];
+                        isIntercalary = (i === 'i' || i === 'I');
+                    } else {
+                        if (monthString[0] === '闰') {
+                            isIntercalary = true;
+                            monthString = monthString.substring(1);
+                        }
+                        if (monthString[monthString.length - 1] === '月') {
+                            monthString = monthString.substring(0, monthString.length - 1);
+                        }
+                        month = 1 +
+                            ['一','二','三','四','五','六',
+                            '七','八','九','十','十一','十二'].indexOf(monthString);
+                    }
+
+                    var monthIndex =
+                        ChineseCalendar.prototype.toMonthIndex(year, month, isIntercalary);
+                    return monthIndex;
                 },
                 dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
                 dayNamesShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
@@ -379,7 +419,10 @@
     });
 
     // Used by ChineseCalendar.prototype.fromString
-    var DATE_REGEXP = /^\s*(-?\d\d\d\d|\d\d)[-/](\d?\d)([i|I]?)[-/](\d?\d)/m;
+    var DATE_REGEXP = /^\s*(-?\d\d\d\d|\d\d)[-/](\d?\d)([iI]?)[-/](\d?\d)/m;
+    var MONTH_NUMBER_REGEXP = /^\d?\d[iI]?/m;
+    var MONTH_NAME_REGEXP = /^闰?十?[一二三四五六七八九]?月/m;
+    var MONTH_SHORT_NAME_REGEXP = /^闰?十?[一二三四五六七八九]?/m;
 
     // Chinese calendar implementation
     $.calendars.calendars.chinese = ChineseCalendar;
