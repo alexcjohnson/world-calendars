@@ -215,6 +215,15 @@ describe('Chinese calendar', function() {
             // test `fromJD(jd)`
             expect(chineseCalendar.fromJD(gregorianDate.toJD()).formatDate(testCase.format))
                 .toEqual(testCase.chinese);
+
+            // test `toMonthIndex`, `toChineseMonth` and `intercalaryMonth`
+            var year = chineseDate.year();
+            var monthIndex = chineseDate.month();
+            var month = chineseCalendar.toChineseMonth(year, monthIndex);
+            var isIntercalary = chineseCalendar.intercalaryMonth(year, monthIndex);
+
+            expect(chineseCalendar.toMonthIndex(year, month, isIntercalary))
+                .toEqual(monthIndex);
         });
     });
 });
