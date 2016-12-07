@@ -163,7 +163,7 @@ describe('Chinese calendar', function() {
 
     it('should convert to and from Gregorian calendar', function() {
         testCases.forEach(function(testCase) {
-            var chineseDate = chineseCalendar.fromString(testCase.chinese);
+            var chineseDate = chineseCalendar.parseDate('', testCase.chinese);
 
             var gregorianDate = gregorianCalendar.newDate(
                 testCase.gregorian.year,
