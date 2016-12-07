@@ -70,13 +70,13 @@
 
                     var month = '' + this.toChineseMonth(year, monthIndex);
 
+                    if (padded && month.length < 2) {
+                        month = "0" + month;
+                    }
+
                     var isIntercalary = this.intercalaryMonth(year, monthIndex);
                     if (isIntercalary) {
                         month += 'i';
-                    }
-
-                    if (padded && month.length < 2) {
-                        month = "0" + month;
                     }
 
                     return month;
