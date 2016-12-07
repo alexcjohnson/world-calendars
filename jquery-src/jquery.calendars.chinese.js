@@ -65,14 +65,12 @@
                         return (match) ? match[0] : '';
                     }
 
-                    var year = ChineseCalendar.prototype._validateYear(date);
+                    var year = this._validateYear(date);
                     var monthIndex = date.month();
 
-                    var month = '' +
-                        ChineseCalendar.prototype.toChineseMonth(year, monthIndex);
+                    var month = '' + this.toChineseMonth(year, monthIndex);
 
-                    var isIntercalary =
-                        ChineseCalendar.prototype.intercalaryMonth(year, monthIndex);
+                    var isIntercalary = this.intercalaryMonth(year, monthIndex);
                     if (isIntercalary) {
                         month += 'i';
                     }
@@ -89,17 +87,15 @@
                         return (match) ? match[0] : '';
                     }
 
-                    var year = ChineseCalendar.prototype._validateYear(date);
+                    var year = this._validateYear(date);
                     var monthIndex = date.month();
 
-                    var month =
-                        ChineseCalendar.prototype.toChineseMonth(year, monthIndex);
+                    var month = this.toChineseMonth(year, monthIndex);
 
                     var monthName = ['一月','二月','三月','四月','五月','六月',
                         '七月','八月','九月','十月','十一月','十二月'][month - 1];
 
-                    var isIntercalary =
-                        ChineseCalendar.prototype.intercalaryMonth(year, monthIndex);
+                    var isIntercalary = this.intercalaryMonth(year, monthIndex);
                     if (isIntercalary) {
                         monthName = '闰' + monthName;
                     }
@@ -112,17 +108,15 @@
                         return (match) ? match[0] : '';
                     }
 
-                    var year = ChineseCalendar.prototype._validateYear(date);
+                    var year = this._validateYear(date);
                     var monthIndex = date.month();
 
-                    var month =
-                        ChineseCalendar.prototype.toChineseMonth(year, monthIndex);
+                    var month = this.toChineseMonth(year, monthIndex);
 
                     var monthName = ['一','二','三','四','五','六',
                         '七','八','九','十','十一','十二'][month - 1];
 
-                    var isIntercalary =
-                        ChineseCalendar.prototype.intercalaryMonth(year, monthIndex);
+                    var isIntercalary = this.intercalaryMonth(year, monthIndex);
                     if (isIntercalary) {
                         monthName = '闰' + monthName;
                     }
@@ -130,7 +124,7 @@
                     return monthName;
                 },
                 parseMonth: function(year, monthString) {
-                    year = ChineseCalendar.prototype._validateYear(year);
+                    year = this._validateYear(year);
                     var month = parseInt(monthString);
                     var isIntercalary;
 
@@ -150,8 +144,7 @@
                             '七','八','九','十','十一','十二'].indexOf(monthString);
                     }
 
-                    var monthIndex =
-                        ChineseCalendar.prototype.toMonthIndex(year, month, isIntercalary);
+                    var monthIndex = this.toMonthIndex(year, month, isIntercalary);
                     return monthIndex;
                 },
                 dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
