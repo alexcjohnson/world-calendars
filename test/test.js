@@ -224,6 +224,16 @@ describe('Chinese calendar', function() {
 
             expect(chineseCalendar.toMonthIndex(year, month, isIntercalary))
                 .toEqual(monthIndex);
+
+            // test `newDate`
+            var day = chineseDate.day();
+
+            expect(
+                chineseCalendar.newDate(
+                    year,
+                    chineseCalendar.toMonthIndex(year, month, isIntercalary),
+                    day).formatDate(testCase.format)
+                ).toEqual(testCase.chinese);
         });
     });
 });
