@@ -180,21 +180,22 @@
 			};
 			// Format month number
 			// (e.g. Chinese calendar needs to account for intercalary months)
+			var calendar = this;
 			var formatMonth = function(date) {
 				return (typeof monthNumbers === 'function') ?
-					monthNumbers(date, doubled('m')) :
+					monthNumbers.call(calendar, date, doubled('m')) :
 					localiseNumbers(formatNumber('m', date.month(), 2));
 			};
 			// Format a month name, short or long as requested
 			var formatMonthName = function(date, useLongName) {
 				if (useLongName) {
 					return (typeof monthNames === 'function') ?
-						monthNames(date) :
-						monthNames[date.month() - this.minMonth];
+						monthNames.call(calendar, date) :
+						monthNames[date.month() - calendar.minMonth];
 				} else {
 					return (typeof monthNamesShort === 'function') ?
-						monthNamesShort(date) :
-						monthNamesShort[date.month() - this.minMonth];
+						monthNamesShort.call(calendar, date) :
+						monthNamesShort[date.month() - calendar.minMonth];
 				}
 			};
 			// Localise numbers if requested and available
@@ -316,10 +317,11 @@
 				return parseInt(num[0], 10);
 			};
 			// Extract a month number from the string value
+			var calendar = this;
 			var getMonthNumber = function() {
 				if (typeof monthNumbers === 'function') {
 					doubled('m');  // update iFormat
-					var month = monthNumbers(value.substring(iValue));
+					var month = monthNumbers.call(calendar, value.substring(iValue));
 					iValue += month.length;
 					return month;
 				}
@@ -327,7 +329,6 @@
 				return getNumber('m');
 			};
 			// Extract a name from the string value and convert to an index
-			var calendar = this;
 			var getName = function(match, shortNames, longNames, step) {
 				var names = (doubled(match, step) ? longNames : shortNames);
 				for (var i = 0; i < names.length; i++) {
@@ -343,8 +344,8 @@
 			var getMonthName = function() {
 				if (typeof monthNames === 'function') {
 					var month = doubled('M') ?
-						monthNames(value.substring(iValue)) :
-						monthNamesShort(value.substring(iValue));
+						monthNames.call(calendar, value.substring(iValue)) :
+						monthNamesShort.call(calendar, value.substring(iValue));
 					iValue += month.length;
 					return month;
 				}
@@ -417,7 +418,7 @@
 					this.today().year() % 100 - (year <= shortYearCutoff ? 0 : 100));
 			}
 			if (typeof month === 'string') {
-				month = parseMonth(year, month);
+				month = parseMonth.call(this, year, month);
 			}
 			if (doy > -1) {
 				month = 1;
