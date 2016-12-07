@@ -151,20 +151,49 @@ describe('Chinese calendar', function() {
     gregorianCalendar = calendars.instance();
 
     testCases = [{
+        format: "yyyy/mm/dd",
         chinese: "2016/11/07",
         gregorian: { year: 2016, month: 12, day: 5 },
     }, {
+        format: "yyyy/m/dd",
         chinese: "2014/11/25",
         gregorian: { year: 2015, month: 1, day: 15 },
     }, {
+        format: "yyyy/mm/dd",
         chinese: "2014/9i/02",
         gregorian: { year: 2014, month: 10, day: 25 },
+    }, {
+        format: "yyyy/m/dd",
+        chinese: "2014/9i/02",
+        gregorian: { year: 2014, month: 10, day: 25 },
+    }, {
+        format: "yyyy/MM/dd",
+        chinese: "1998/五月/01",
+        gregorian: { year: 1998, month: 5, day: 26 },
+    }, {
+        format: "yy-M-d",
+        chinese: "98-五-1",
+        gregorian: { year: 1998, month: 5, day: 26 },
+    }, {
+        format: "yyyy/MM/dd",
+        chinese: "1998/闰五月/01",
+        gregorian: { year: 1998, month: 6, day: 24 },
+    }, {
+        format: "yy-m-d",
+        chinese: "98-5i-1",
+        gregorian: { year: 1998, month: 6, day: 24 },
+    }, {
+        format: "yyyy/mm/dd",
+        chinese: "1998/06/01",
+        gregorian: { year: 1998, month: 7, day: 23 },
+    }, {
+        format: "yy-m-d",
+        chinese: "98-6-1",
+        gregorian: { year: 1998, month: 7, day: 23 },
     }];
 
     it('should convert to and from Gregorian calendar', function() {
         testCases.forEach(function(testCase) {
-            var chineseDate = chineseCalendar.parseDate('', testCase.chinese);
-
             var gregorianDate = gregorianCalendar.newDate(
                 testCase.gregorian.year,
                 testCase.gregorian.month,
@@ -173,10 +202,19 @@ describe('Chinese calendar', function() {
             expect(gregorianDate.month()).toEqual(testCase.gregorian.month);
             expect(gregorianDate.day()).toEqual(testCase.gregorian.day);
 
+            // test `parseDate`
+            var chineseDate =
+                chineseCalendar.parseDate(testCase.format, testCase.chinese);
+
+            // test `toJD()`
             expect(chineseDate.toJD()).toEqual(gregorianDate.toJD());
 
-            expect(chineseDate.formatDate()).toEqual(testCase.chinese);
-            expect(chineseCalendar.fromJD(gregorianDate.toJD()).formatDate()).toEqual(testCase.chinese);
+            // test `formatDate`
+            expect(chineseDate.formatDate(testCase.format)).toEqual(testCase.chinese);
+
+            // test `fromJD(jd)`
+            expect(chineseCalendar.fromJD(gregorianDate.toJD()).formatDate(testCase.format))
+                .toEqual(testCase.chinese);
         });
     });
 });
