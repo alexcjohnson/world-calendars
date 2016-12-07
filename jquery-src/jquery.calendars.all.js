@@ -1043,6 +1043,7 @@
 			settings = settings || {};
 			var dayNamesShort = settings.dayNamesShort || this.local.dayNamesShort;
 			var dayNames = settings.dayNames || this.local.dayNames;
+			var monthNumbers = settings.monthNumbers || this.local.monthNumbers;
 			var monthNamesShort = settings.monthNamesShort || this.local.monthNamesShort;
 			var monthNames = settings.monthNames || this.local.monthNames;
 			var calculateWeek = settings.calculateWeek || this.local.calculateWeek;
@@ -1069,6 +1070,25 @@
 			var formatName = function(match, value, shortNames, longNames) {
 				return (doubled(match) ? longNames[value] : shortNames[value]);
 			};
+			// Format month number
+			// (e.g. Chinese calendar needs to account for intercalary months)
+			var formatMonth = function(date) {
+				return (typeof monthNumbers === 'function') ?
+					monthNumbers(date, doubled('m')) :
+					localiseNumbers(formatNumber('m', date.month(), 2));
+			};
+			// Format a month name, short or long as requested
+			var formatMonthName = function(date, useLongName) {
+				if (useLongName) {
+					return (typeof monthNames === 'function') ?
+						monthNames(date) :
+						monthNames[date.month() - this.minMonth];
+				} else {
+					return (typeof monthNamesShort === 'function') ?
+						monthNamesShort(date) :
+						monthNamesShort[date.month() - this.minMonth];
+				}
+			};
 			// Localise numbers if requested and available
 			var digits = this.local.digits;
 			var localiseNumbers = function(value) {
@@ -1092,9 +1112,8 @@
 							dayNamesShort, dayNames); break;
 						case 'o': output += formatNumber('o', date.dayOfYear(), 3); break;
 						case 'w': output += formatNumber('w', date.weekOfYear(), 2); break;
-						case 'm': output += localiseNumbers(formatNumber('m', date.month(), 2)); break;
-						case 'M': output += formatName('M', date.month() - this.minMonth,
-							monthNamesShort, monthNames); break;
+						case 'm': output += formatMonth(date); break;
+						case 'M': output += formatMonthName(date, doubled('M')); break;
 						case 'y':
 							output += (doubled('y', 2) ? date.year() :
 								(date.year() % 100 < 10 ? '0' : '') + date.year() % 100);
@@ -1155,6 +1174,8 @@
 				this.today().year() % 100 + parseInt(shortYearCutoff, 10));
 			var dayNamesShort = settings.dayNamesShort || this.local.dayNamesShort;
 			var dayNames = settings.dayNames || this.local.dayNames;
+			var parseMonth = settings.parseMonth || this.local.parseMonth;
+			var monthNumbers = settings.monthNumbers || this.local.monthNumbers;
 			var monthNamesShort = settings.monthNamesShort || this.local.monthNamesShort;
 			var monthNames = settings.monthNames || this.local.monthNames;
 			var jd = -1;
@@ -1186,6 +1207,17 @@
 				iValue += num[0].length;
 				return parseInt(num[0], 10);
 			};
+			// Extract a month number from the string value
+			var getMonthNumber = function() {
+				if (typeof monthNumbers === 'function') {
+					doubled('m');  // update iFormat
+					var month = monthNumbers(value.substring(iValue));
+					iValue += month.length;
+					return month;
+				}
+
+				return getNumber('m');
+			};
 			// Extract a name from the string value and convert to an index
 			var calendar = this;
 			var getName = function(match, shortNames, longNames, step) {
@@ -1198,6 +1230,18 @@
 				}
 				throw ($.calendars.local.unknownNameAt || $.calendars.regionalOptions[''].unknownNameAt).
 					replace(/\{0\}/, iValue);
+			};
+			// Extract a month number from the string value
+			var getMonthName = function() {
+				if (typeof monthNames === 'function') {
+					var month = doubled('M') ?
+						monthNames(value.substring(iValue)) :
+						monthNamesShort(value.substring(iValue));
+					iValue += month.length;
+					return month;
+				}
+
+				return getName('M', monthNamesShort, monthNames);
 			};
 			// Confirm that a literal character matches the string value
 			var checkLiteral = function() {
@@ -1223,8 +1267,8 @@
 						case 'D': getName('D', dayNamesShort, dayNames); break;
 						case 'o': doy = getNumber('o'); break;
 						case 'w': getNumber('w'); break;
-						case 'm': month = getNumber('m'); break;
-						case 'M': month = getName('M', monthNamesShort, monthNames); break;
+						case 'm': month = getMonthNumber(); break;
+						case 'M': month = getMonthName(); break;
 						case 'y':
 							var iSave = iFormat;
 							shortYear = !doubled('y', 2);
@@ -1263,6 +1307,9 @@
 			else if (year < 100 && shortYear) {
 				year += (shortYearCutoff === -1 ? 1900 : this.today().year() -
 					this.today().year() % 100 - (year <= shortYearCutoff ? 0 : 100));
+			}
+			if (typeof month === 'string') {
+				month = parseMonth(year, month);
 			}
 			if (doy > -1) {
 				month = 1;

@@ -102,7 +102,10 @@ describe('World calendars', function() {
             nepali: [[2073, 7, 15]],
             nanakshahi: [[548, 8, 17]],
             mayan: [[5203, 16, 10]],
-            discworld: [[1841, 9, 28]]
+            discworld: [[1841, 9, 28]],
+            // In order to handle intercalary months,
+            // the Chinese calendar uses month indices starting from 0
+            chinese: [[2016, 10 - 1, 1]]
         };
 
         var mayanYears = ['13.0.3'];
@@ -136,4 +139,101 @@ describe('World calendars', function() {
     });
 
     // TODO: test localizations?
+});
+
+describe('Chinese calendar', function() {
+    var chineseCalendar;
+    var gregorianCalendar;
+    var testCases;
+
+    chineseCalendar = calendars.instance("Chinese");
+
+    gregorianCalendar = calendars.instance();
+
+    testCases = [{
+        format: "yyyy/mm/dd",
+        chinese: "2016/11/07",
+        gregorian: { year: 2016, month: 12, day: 5 },
+    }, {
+        format: "yyyy/m/dd",
+        chinese: "2014/11/25",
+        gregorian: { year: 2015, month: 1, day: 15 },
+    }, {
+        format: "yyyy/mm/dd",
+        chinese: "2014/9i/02",
+        gregorian: { year: 2014, month: 10, day: 25 },
+    }, {
+        format: "yyyy/m/dd",
+        chinese: "2014/9i/02",
+        gregorian: { year: 2014, month: 10, day: 25 },
+    }, {
+        format: "yyyy/MM/dd",
+        chinese: "1998/五月/01",
+        gregorian: { year: 1998, month: 5, day: 26 },
+    }, {
+        format: "yy-M-d",
+        chinese: "98-五-1",
+        gregorian: { year: 1998, month: 5, day: 26 },
+    }, {
+        format: "yyyy/MM/dd",
+        chinese: "1998/闰五月/01",
+        gregorian: { year: 1998, month: 6, day: 24 },
+    }, {
+        format: "yy-m-d",
+        chinese: "98-5i-1",
+        gregorian: { year: 1998, month: 6, day: 24 },
+    }, {
+        format: "yyyy/mm/dd",
+        chinese: "1998/06/01",
+        gregorian: { year: 1998, month: 7, day: 23 },
+    }, {
+        format: "yy-m-d",
+        chinese: "98-6-1",
+        gregorian: { year: 1998, month: 7, day: 23 },
+    }];
+
+    it('should convert to and from Gregorian calendar', function() {
+        testCases.forEach(function(testCase) {
+            var gregorianDate = gregorianCalendar.newDate(
+                testCase.gregorian.year,
+                testCase.gregorian.month,
+                testCase.gregorian.day);
+            expect(gregorianDate.year()).toEqual(testCase.gregorian.year);
+            expect(gregorianDate.month()).toEqual(testCase.gregorian.month);
+            expect(gregorianDate.day()).toEqual(testCase.gregorian.day);
+
+            // test `parseDate`
+            var chineseDate =
+                chineseCalendar.parseDate(testCase.format, testCase.chinese);
+
+            // test `toJD()`
+            expect(chineseDate.toJD()).toEqual(gregorianDate.toJD());
+
+            // test `formatDate`
+            expect(chineseDate.formatDate(testCase.format)).toEqual(testCase.chinese);
+
+            // test `fromJD(jd)`
+            expect(chineseCalendar.fromJD(gregorianDate.toJD()).formatDate(testCase.format))
+                .toEqual(testCase.chinese);
+
+            // test `toMonthIndex`, `toChineseMonth` and `intercalaryMonth`
+            var year = chineseDate.year();
+            var monthIndex = chineseDate.month();
+            var month = chineseCalendar.toChineseMonth(year, monthIndex);
+            var isIntercalary = chineseCalendar.intercalaryMonth(year, monthIndex);
+
+            expect(chineseCalendar.toMonthIndex(year, month, isIntercalary))
+                .toEqual(monthIndex);
+
+            // test `newDate`
+            var day = chineseDate.day();
+
+            expect(
+                chineseCalendar.newDate(
+                    year,
+                    chineseCalendar.toMonthIndex(year, month, isIntercalary),
+                    day).formatDate(testCase.format)
+                ).toEqual(testCase.chinese);
+        });
+    });
 });
