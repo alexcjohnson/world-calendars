@@ -160,7 +160,7 @@ describe('Chinese calendar', function() {
         gregorian: { year: 2015, month: 1, day: 15 },
     }, {
         format: "yyyy/mm/dd",
-        chinese: "2014/9i/02",
+        chinese: "2014/09i/02",
         gregorian: { year: 2014, month: 10, day: 25 },
     }, {
         format: "yyyy/m/dd",
