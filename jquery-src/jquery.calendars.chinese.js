@@ -74,8 +74,8 @@
                         month = "0" + month;
                     }
 
-                    var isIntercalary = this.intercalaryMonth(year, monthIndex);
-                    if (isIntercalary) {
+                    var intercalaryMonth = this.intercalaryMonth(year);
+                    if (monthIndex === intercalaryMonth) {
                         month += 'i';
                     }
 
@@ -95,8 +95,8 @@
                     var monthName = ['一月','二月','三月','四月','五月','六月',
                         '七月','八月','九月','十月','十一月','十二月'][month - 1];
 
-                    var isIntercalary = this.intercalaryMonth(year, monthIndex);
-                    if (isIntercalary) {
+                    var intercalaryMonth = this.intercalaryMonth(year);
+                    if (monthIndex === intercalaryMonth) {
                         monthName = '闰' + monthName;
                     }
 
@@ -116,8 +116,8 @@
                     var monthName = ['一','二','三','四','五','六',
                         '七','八','九','十','十一','十二'][month - 1];
 
-                    var isIntercalary = this.intercalaryMonth(year, monthIndex);
-                    if (isIntercalary) {
+                    var intercalaryMonth = this.intercalaryMonth(year);
+                    if (monthIndex === intercalaryMonth) {
                         monthName = '闰' + monthName;
                     }
 
@@ -185,11 +185,7 @@
             @throws Error if an invalid month/year or a different calendar used. */
         toMonthIndex: function(year, month, isIntercalary) {
             // compute intercalary month in the year (0 if none)
-            var validatedYear =
-                this._validateYear(year, $.calendars.local.invalidyear);
-            var monthDaysTable =
-                LUNAR_MONTH_DAYS[validatedYear - LUNAR_MONTH_DAYS[0]];
-            var intercalaryMonth = monthDaysTable >> 13;
+            var intercalaryMonth = this.intercalaryMonth(year);
 
             // validate month
             var invalidIntercalaryMonth = 
@@ -221,11 +217,7 @@
             @throws Error if an invalid month/year or a different calendar used. */
         toChineseMonth: function(year, monthIndex) {
             // compute intercalary month in the year (0 if none)
-            var validatedYear =
-                this._validateYear(year, $.calendars.local.invalidyear);
-            var monthDaysTable =
-                LUNAR_MONTH_DAYS[validatedYear - LUNAR_MONTH_DAYS[0]];
-            var intercalaryMonth = monthDaysTable >> 13;
+            var intercalaryMonth = this.intercalaryMonth(year);
 
             // validate month
             var maxMonthIndex = (intercalaryMonth) ? 12 : 11;
@@ -248,32 +240,19 @@
             return month;
         },
 
-        /** Determine whether this date is in an intercalary month.
+        /** Determine the intercalary month of a year (if any).
             @memberof ChineseCalendar
             @param year {CDate|number} The date to examine or the year to examine.
             @param [monthIndex] {number} The month index to examine.
-            @return {boolean} <code>true</code> if this is an intercalary month, <code>false</code> if not.
+            @return {number} The intercalary month number, or 0 if none.
             @throws Error if an invalid year or a different calendar used. */
-        intercalaryMonth: function(year, monthIndex) {
-            if (year.year) {
-                monthIndex = year.month();
-                year = this._validateYear(year);
-            }
-
-            var monthDaysTable = LUNAR_MONTH_DAYS[year - LUNAR_MONTH_DAYS[0]];
-
-            var intercalaryMonth = monthDaysTable >> 13;
-            var maxMonthIndex = (intercalaryMonth) ? 12 : 11;
-            if (monthIndex > maxMonthIndex) {
-                throw $.calendars.local.invalidMonth
-                    .replace(/\{0\}/, this.local.name);
-            }
-            year = this._validateYear(year, $.calendars.local.invalidyear);
+        intercalaryMonth: function(year) {
+            year = this._validateYear(year);
 
             var monthDaysTable = LUNAR_MONTH_DAYS[year - LUNAR_MONTH_DAYS[0]];
             var intercalaryMonth = monthDaysTable >> 13;
 
-            return (intercalaryMonth && intercalaryMonth === monthIndex);
+            return intercalaryMonth;
         },
 
         /** Determine whether this date is in a leap year.
@@ -282,12 +261,7 @@
             @return {boolean} <code>true</code> if this is a leap year, <code>false</code> if not.
             @throws Error if an invalid year or a different calendar used. */
         leapYear: function(year) {
-            year = this._validateYear(year, $.calendars.local.invalidyear);
-
-            var monthDaysTable = LUNAR_MONTH_DAYS[year - LUNAR_MONTH_DAYS[0]];
-            var intercalaryMonth = monthDaysTable >> 13;
-
-            return (intercalaryMonth !== 0);
+            return (this.intercalaryMonth(year) !== 0);
         },
 
         /** Determine the week of the year for a date - ISO 8601.
@@ -313,10 +287,19 @@
             firstThursday = gregorianCalendar.newDate(y, m, d);
             firstThursday.add(4 - (firstThursday.dayOfWeek() || 7), 'd');
 
-            // compute days from first Thrusday
+            // compute days from first Thursday
             var offset =
                 this.toJD(year, monthIndex, day) - firstThursday.toJD();
             return 1 + Math.floor(offset / 7);
+        },
+
+        /** Retrieve the number of months in a year.
+            @memberof ChineseCalendar
+            @param year {CDate|number} The date to examine or the year to examine.
+            @return {number} The number of months.
+            @throws Error if an invalid year or a different calendar used. */
+        monthsInYear: function(year) {
+            return (this.leapYear(year)) ? 13 : 12;
         },
 
         /** Retrieve the number of days in a month.
@@ -328,8 +311,10 @@
         daysInMonth: function(year, monthIndex) {
             if (year.year) {
                 monthIndex = year.month();
-                year = this._validateYear(year);
+                year = year.year();
             }
+
+            year = this._validateYear(year);
 
             var monthDaysTable = LUNAR_MONTH_DAYS[year - LUNAR_MONTH_DAYS[0]];
 
@@ -371,8 +356,8 @@
             monthIndex = date.month();
             day = date.day();
 
+            var isIntercalary = (monthIndex === this.intercalaryMonth(year));
             var month = this.toChineseMonth(year, monthIndex);
-            var isIntercalary = this.intercalaryMonth(year, monthIndex);
 
             var solar = toSolar(year, month, day, isIntercalary);
 
@@ -408,6 +393,46 @@
             var day = +match[4];
 
             return this.newDate(year, monthIndex, day);
+        },
+
+        /** Add period(s) to a date.
+            Cater for no year zero.
+            @memberof ChineseCalendar
+            @param date {CDate} The starting date.
+            @param offset {number} The number of periods to adjust by.
+            @param period {string} One of 'y' for year, 'm' for month, 'w' for week, 'd' for day.
+            @return {CDate} The updated date.
+            @throws Error if a different calendar used. */
+        add: function(date, offset, period) {
+            var year = date.year();
+            var monthIndex = date.month();
+            var isIntercalary = (monthIndex === this.intercalaryMonth(year));
+            var month = this.toChineseMonth(year, monthIndex);
+
+            var cdate = Object.getPrototypeOf(ChineseCalendar.prototype)
+                .add.call(this, date, offset, period);
+
+            if (period === 'y') {
+                // Resync month
+                var resultYear = cdate.year();
+                var resultMonthIndex = cdate.month();
+
+                // Using the fact the month index of an intercalary month
+                // equals its month number:
+                var resultCanBeIntercalaryMonth =
+                    (month === this.intercalaryMonth(resultYear));
+
+                var correctedMonthIndex =
+                    (isIntercalary && resultCanBeIntercalaryMonth) ?
+                    this.toMonthIndex(resultYear, month, true) :
+                    this.toMonthIndex(resultYear, month, false);
+
+                if (correctedMonthIndex !== resultMonthIndex) {
+                    cdate.month(correctedMonthIndex);
+                }
+            }
+
+            return cdate;
         },
     });
 

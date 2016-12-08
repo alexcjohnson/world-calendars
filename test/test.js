@@ -219,8 +219,9 @@ describe('Chinese calendar', function() {
             // test `toMonthIndex`, `toChineseMonth` and `intercalaryMonth`
             var year = chineseDate.year();
             var monthIndex = chineseDate.month();
+            var isIntercalary =
+                (monthIndex === chineseCalendar.intercalaryMonth(year));
             var month = chineseCalendar.toChineseMonth(year, monthIndex);
-            var isIntercalary = chineseCalendar.intercalaryMonth(year, monthIndex);
 
             expect(chineseCalendar.toMonthIndex(year, month, isIntercalary))
                 .toEqual(monthIndex);
@@ -235,5 +236,50 @@ describe('Chinese calendar', function() {
                     day).formatDate(testCase.format)
                 ).toEqual(testCase.chinese);
         });
+    });
+
+    it('should compute the number of months in a year correctly', function() {
+        for(var year = 1888; year < 2112; year++) {
+            var monthsInYear = (chineseCalendar.leapYear(year)) ? 13 : 12;
+            expect(chineseCalendar.monthsInYear(year)).toEqual(monthsInYear);
+        }
+    });
+
+    it('should keep months in sync when adding years', function() {
+        testCases.forEach(function(testCase) {
+            var chineseDate =
+                chineseCalendar.parseDate(testCase.format, testCase.chinese);
+
+            var year = chineseDate.year();
+            var monthIndex = chineseDate.month();
+            var isIntercalary =
+                (monthIndex === chineseCalendar.intercalaryMonth(year));
+            var month = chineseCalendar.toChineseMonth(year, monthIndex);
+
+            chineseDate.add(1, 'y');
+
+            var resultYear = chineseDate.year();
+            var resultLeapYear = chineseDate.leapYear();
+            var resultMonthIndex = chineseDate.month();
+            var resultMonth =
+                chineseCalendar.toChineseMonth(resultYear, resultMonthIndex);
+
+            expect(resultYear).toEqual(year + 1);
+            expect(resultMonth).toEqual(month);
+
+            // no consecutive leap years
+            var resultIsIntercalary = (resultMonthIndex ===
+                chineseCalendar.intercalaryMonth(resultYear, resultMonthIndex));
+            expect(resultIsIntercalary).toEqual(false);
+        });
+
+        var chineseDate = chineseCalendar.parseDate(null, "1895/05i/05");
+
+        chineseDate.add(19, 'y');
+        expect(chineseDate.formatDate()).toEqual("1914/05i/05");
+
+        chineseDate.add(3, 'y');
+        expect(chineseCalendar.leapYear(chineseDate.year())).toEqual(true);
+        expect(chineseDate.formatDate()).toEqual("1917/05/05");
     });
 });
