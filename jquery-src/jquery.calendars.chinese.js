@@ -273,7 +273,7 @@
             var monthDaysTable = LUNAR_MONTH_DAYS[year - LUNAR_MONTH_DAYS[0]];
             var intercalaryMonth = monthDaysTable >> 13;
 
-            return (intercalaryMonth && intercalaryMonth === monthIndex);
+            return (intercalaryMonth !== 0 && intercalaryMonth === monthIndex);
         },
 
         /** Determine whether this date is in a leap year.
@@ -417,6 +417,41 @@
             var day = +match[4];
 
             return this.newDate(year, monthIndex, day);
+        },
+
+        /** Add period(s) to a date.
+            Cater for no year zero.
+            @memberof ChineseCalendar
+            @param date {CDate} The starting date.
+            @param offset {number} The number of periods to adjust by.
+            @param period {string} One of 'y' for year, 'm' for month, 'w' for week, 'd' for day.
+            @return {CDate} The updated date.
+            @throws Error if a different calendar used. */
+        add: function(date, offset, period) {
+            var year = date.year();
+            var monthIndex = date.month();
+            var month = this.toChineseMonth(year, monthIndex);
+            var isIntercalary = this.intercalaryMonth(year, monthIndex);
+
+            var cdate = Object.getPrototypeOf(ChineseCalendar.prototype)
+                .add.call(this, date, offset, period);
+
+            if (period === 'y') {
+                // Resync month
+                var resultYear = cdate.year();
+                var resultLeapYear = cdate.leapYear();
+                var resultMonthIndex = cdate.month();
+
+                var correctedMonthIndex = (isIntercalary && resultLeapYear) ?
+                    this.toMonthIndex(resultYear, month, true) :
+                    this.toMonthIndex(resultYear, month, false);
+
+                if (correctedMonthIndex !== resultMonthIndex) {
+                    cdate.month(correctedMonthIndex);
+                }
+            }
+
+            return cdate;
         },
     });
 
