@@ -313,10 +313,19 @@
             firstThursday = gregorianCalendar.newDate(y, m, d);
             firstThursday.add(4 - (firstThursday.dayOfWeek() || 7), 'd');
 
-            // compute days from first Thrusday
+            // compute days from first Thursday
             var offset =
                 this.toJD(year, monthIndex, day) - firstThursday.toJD();
             return 1 + Math.floor(offset / 7);
+        },
+
+        /** Retrieve the number of months in a year.
+            @memberof ChineseCalendar
+            @param year {CDate|number} The date to examine or the year to examine.
+            @return {number} The number of months.
+            @throws Error if an invalid year or a different calendar used. */
+        monthsInYear: function(year) {
+            return (this.leapYear(year)) ? 13 : 12;
         },
 
         /** Retrieve the number of days in a month.
