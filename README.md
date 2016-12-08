@@ -1,7 +1,7 @@
 # world-calendars
 Node module for converting between various calendars
 
-This project takes [kbwood/calendars](https://github.com/kbwood/calendars) and transforms them from a jQuery plugin to a node module. Many thanks to Keith Wood and all of the contributors to the original project!
+This project takes [kbwood/calendars](https://github.com/kbwood/calendars) and transforms them from a jQuery plugin to a node module. Many thanks to Keith Wood and all of the contributors to the original project! We support all the calendars in that project plus the Chinese lunar calendar.
 
 kbwood/calendars was originally pulled at version 2.0.2 in October 2016.
 
