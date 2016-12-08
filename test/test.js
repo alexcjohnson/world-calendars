@@ -270,5 +270,14 @@ describe('Chinese calendar', function() {
             expect(resultIsIntercalary)
                 .toEqual(isIntercalary && resultLeapYear);
         });
+
+        var chineseDate = chineseCalendar.parseDate(null, "1895/05i/05");
+
+        chineseDate.add(19, 'y');
+        expect(chineseDate.formatDate()).toEqual("1914/05i/05");
+
+        chineseDate.add(3, 'y');
+        expect(chineseCalendar.leapYear(chineseDate.year())).toEqual(true);
+        expect(chineseDate.formatDate()).toEqual("1917/05/05");
     });
 });

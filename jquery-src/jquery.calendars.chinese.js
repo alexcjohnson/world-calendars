@@ -439,10 +439,15 @@
             if (period === 'y') {
                 // Resync month
                 var resultYear = cdate.year();
-                var resultLeapYear = cdate.leapYear();
                 var resultMonthIndex = cdate.month();
 
-                var correctedMonthIndex = (isIntercalary && resultLeapYear) ?
+                // Using the fact the month index of an intercalary month
+                // equals its month number:
+                var resultCanBeIntercalaryMonth =
+                    this.intercalaryMonth(resultYear, month);
+
+                var correctedMonthIndex =
+                    (isIntercalary && resultCanBeIntercalaryMonth) ?
                     this.toMonthIndex(resultYear, month, true) :
                     this.toMonthIndex(resultYear, month, false);
 
