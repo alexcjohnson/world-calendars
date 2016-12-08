@@ -236,4 +236,11 @@ describe('Chinese calendar', function() {
                 ).toEqual(testCase.chinese);
         });
     });
+
+    it('should convert to and from Gregorian calendar', function() {
+        for(var year = 1888; year < 2112; year++) {
+            var monthsInYear = (chineseCalendar.leapYear(year)) ? 13 : 12;
+            expect(chineseCalendar.monthsInYear(year)).toEqual(monthsInYear);
+        }
+    });
 });
