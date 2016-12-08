@@ -219,8 +219,9 @@ describe('Chinese calendar', function() {
             // test `toMonthIndex`, `toChineseMonth` and `intercalaryMonth`
             var year = chineseDate.year();
             var monthIndex = chineseDate.month();
+            var isIntercalary =
+                (monthIndex === chineseCalendar.intercalaryMonth(year));
             var month = chineseCalendar.toChineseMonth(year, monthIndex);
-            var isIntercalary = chineseCalendar.intercalaryMonth(year, monthIndex);
 
             expect(chineseCalendar.toMonthIndex(year, month, isIntercalary))
                 .toEqual(monthIndex);
@@ -251,9 +252,9 @@ describe('Chinese calendar', function() {
 
             var year = chineseDate.year();
             var monthIndex = chineseDate.month();
-            var month = chineseCalendar.toChineseMonth(year, monthIndex);
             var isIntercalary =
-                chineseCalendar.intercalaryMonth(year, monthIndex);
+                (monthIndex === chineseCalendar.intercalaryMonth(year));
+            var month = chineseCalendar.toChineseMonth(year, monthIndex);
 
             chineseDate.add(1, 'y');
 
@@ -262,13 +263,14 @@ describe('Chinese calendar', function() {
             var resultMonthIndex = chineseDate.month();
             var resultMonth =
                 chineseCalendar.toChineseMonth(resultYear, resultMonthIndex);
-            var resultIsIntercalary =
-                chineseCalendar.intercalaryMonth(resultYear, resultMonthIndex);
 
             expect(resultYear).toEqual(year + 1);
             expect(resultMonth).toEqual(month);
-            expect(resultIsIntercalary)
-                .toEqual(isIntercalary && resultLeapYear);
+
+            // no consecutive leap years
+            var resultIsIntercalary = (resultMonthIndex ===
+                chineseCalendar.intercalaryMonth(resultYear, resultMonthIndex));
+            expect(resultIsIntercalary).toEqual(false);
         });
 
         var chineseDate = chineseCalendar.parseDate(null, "1895/05i/05");
