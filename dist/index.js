@@ -11,6 +11,7 @@
 
 module.exports = require('./main');
 require('./plus');
+require('./calendars/chinese');
 require('./calendars/coptic');
 require('./calendars/discworld');
 require('./calendars/ethiopian');
