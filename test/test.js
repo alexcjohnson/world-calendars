@@ -282,4 +282,47 @@ describe('Chinese calendar', function() {
         expect(chineseCalendar.leapYear(chineseDate.year())).toEqual(true);
         expect(chineseDate.formatDate()).toEqual("1917/05/05");
     });
+
+    it('should include intercalary months when incrementing months', function() {
+        var testCases = [
+            "1895/05/05",
+            "1914/05/05",
+            "1995/08/01",
+            "1998/05/01",
+            "2014/09/02",
+        ];
+        testCases.forEach(function(testCase) {
+            var chineseDate = chineseCalendar.parseDate(null, testCase);
+            var year = chineseDate.year();
+            var intercalaryMonth = chineseCalendar.intercalaryMonth(year);
+            var monthIndex = chineseDate.month();
+            var monthString = chineseDate.formatDate("m");
+
+            // initial date isn't an intercalary month
+            expect(monthIndex).not.toEqual(intercalaryMonth);
+            expect(monthString.charAt(monthString.length - 1))
+                .not.toEqual("i");
+
+            // next month is an intercalary month
+            chineseDate.add(1, 'm');
+            var nextDateYear = chineseDate.year();
+            var nextDateMonthIndex = chineseDate.month();
+            var nextDateMonthString = chineseDate.formatDate("m");
+            expect(nextDateYear).toEqual(year);
+            expect(nextDateMonthIndex).toEqual(monthIndex + 1);
+            expect(nextDateMonthIndex).toEqual(intercalaryMonth);
+            expect(nextDateMonthString.charAt(nextDateMonthString.length - 1))
+                .toEqual("i");
+
+            // and next month isn't
+            chineseDate.add(1, 'm');
+            nextDateYear = chineseDate.year();
+            nextDateMonthIndex = chineseDate.month();
+            nextDateMonthString = chineseDate.formatDate("m");
+            expect(nextDateYear).toEqual(year);
+            expect(nextDateMonthIndex).toEqual(monthIndex + 2);
+            expect(nextDateMonthString.charAt(nextDateMonthString.length - 1))
+                .not.toEqual("i");
+        });
+    });
 });
