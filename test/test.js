@@ -325,4 +325,19 @@ describe('Chinese calendar', function() {
                 .not.toEqual("i");
         });
     });
+
+    it('should format dates in the first month correctly', function() {
+        for(var year = 1888; year < 2112; year++) {
+            var newYearString = year + "/01/01";
+            var newYear = chineseCalendar.parseDate(null,newYearString); 
+            expect(newYear.formatDate()).toBe(newYearString);
+
+            var intercalaryMonth = chineseCalendar.intercalaryMonth(year);
+            if (intercalaryMonth === 1) {
+                newYearString = year + "/01i/01";
+                newYear = chineseCalendar.parseDate(null, newYearString);
+                expect(newYear.formatDate()).toBe(newYearString);
+            }
+        }
+    });
 });
