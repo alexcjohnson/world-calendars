@@ -255,8 +255,6 @@ describe('Chinese calendar', function() {
 
             var year = chineseDate.year();
             var monthIndex = chineseDate.month();
-            var isIntercalary =
-                (monthIndex === chineseCalendar.intercalaryMonth(year));
             var month = chineseCalendar.toChineseMonth(year, monthIndex);
 
             chineseDate.add(1, 'y');
