@@ -216,13 +216,16 @@ describe('Chinese calendar', function() {
             expect(chineseCalendar.fromJD(gregorianDate.toJD()).formatDate(testCase.format))
                 .toEqual(testCase.chinese);
 
-            // test `toMonthIndex`, `toChineseMonth` and `intercalaryMonth`
+            // test `toMonthIndex`, `toChineseMonth`, `intercalaryMonth` and
+            // `isIntercalary`
             var year = chineseDate.year();
             var monthIndex = chineseDate.month();
             var isIntercalary =
                 (monthIndex === chineseCalendar.intercalaryMonth(year));
             var month = chineseCalendar.toChineseMonth(year, monthIndex);
 
+            expect(chineseCalendar.isIntercalaryMonth(year, monthIndex))
+                .toBe(isIntercalary);
             expect(chineseCalendar.toMonthIndex(year, month, isIntercalary))
                 .toEqual(monthIndex);
 
