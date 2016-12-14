@@ -208,11 +208,16 @@
 
         /** Retrieve the month (i.e. accounting for intercalary months).
             @memberof ChineseCalendar
-            @param year {number} The year.
+            @param year {CDate|number} The date or the year to examine.
             @param monthIndex {number} The month index (0 for first month).
             @return {number} The month (1 for first month).
             @throws Error if an invalid month/year or a different calendar used. */
         toChineseMonth: function(year, monthIndex) {
+            if (year.year) {
+                year = year.year();
+                monthIndex = year.month();
+            }
+
             // compute intercalary month in the year (0 if none)
             var intercalaryMonth = this.intercalaryMonth(year);
 
