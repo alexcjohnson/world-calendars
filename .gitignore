@@ -35,3 +35,9 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+# Vim swap files
+*.sw?
+
+# yarn lock
+yarn.lock
