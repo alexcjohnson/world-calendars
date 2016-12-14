@@ -74,8 +74,7 @@
                         month = "0" + month;
                     }
 
-                    var intercalaryMonth = this.intercalaryMonth(year);
-                    if (intercalaryMonth && monthIndex === intercalaryMonth) {
+                    if (this.isIntercalaryMonth(year, monthIndex)) {
                         month += 'i';
                     }
 
@@ -95,8 +94,7 @@
                     var monthName = ['一月','二月','三月','四月','五月','六月',
                         '七月','八月','九月','十月','十一月','十二月'][month - 1];
 
-                    var intercalaryMonth = this.intercalaryMonth(year);
-                    if (intercalaryMonth && monthIndex === intercalaryMonth) {
+                    if (this.isIntercalaryMonth(year, monthIndex)) {
                         monthName = '闰' + monthName;
                     }
 
@@ -116,8 +114,7 @@
                     var monthName = ['一','二','三','四','五','六',
                         '七','八','九','十','十一','十二'][month - 1];
 
-                    var intercalaryMonth = this.intercalaryMonth(year);
-                    if (intercalaryMonth && monthIndex === intercalaryMonth) {
+                    if (this.isIntercalaryMonth(year, monthIndex)) {
                         monthName = '闰' + monthName;
                     }
 
@@ -372,7 +369,7 @@
             monthIndex = date.month();
             day = date.day();
 
-            var isIntercalary = (monthIndex === this.intercalaryMonth(year));
+            var isIntercalary = this.isIntercalaryMonth(year, monthIndex);
             var month = this.toChineseMonth(year, monthIndex);
 
             var solar = toSolar(year, month, day, isIntercalary);
@@ -422,7 +419,7 @@
         add: function(date, offset, period) {
             var year = date.year();
             var monthIndex = date.month();
-            var isIntercalary = (monthIndex === this.intercalaryMonth(year));
+            var isIntercalary = this.isIntercalaryMonth(year, monthIndex);
             var month = this.toChineseMonth(year, monthIndex);
 
             var cdate = Object.getPrototypeOf(ChineseCalendar.prototype)
@@ -436,7 +433,7 @@
                 // Using the fact the month index of an intercalary month
                 // equals its month number:
                 var resultCanBeIntercalaryMonth =
-                    (month === this.intercalaryMonth(resultYear));
+                    this.isIntercalaryMonth(resultYear, month);
 
                 var correctedMonthIndex =
                     (isIntercalary && resultCanBeIntercalaryMonth) ?
