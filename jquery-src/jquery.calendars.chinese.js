@@ -75,7 +75,7 @@
                     }
 
                     var intercalaryMonth = this.intercalaryMonth(year);
-                    if (monthIndex === intercalaryMonth) {
+                    if (intercalaryMonth && monthIndex === intercalaryMonth) {
                         month += 'i';
                     }
 
@@ -96,7 +96,7 @@
                         '七月','八月','九月','十月','十一月','十二月'][month - 1];
 
                     var intercalaryMonth = this.intercalaryMonth(year);
-                    if (monthIndex === intercalaryMonth) {
+                    if (intercalaryMonth && monthIndex === intercalaryMonth) {
                         monthName = '闰' + monthName;
                     }
 
@@ -117,7 +117,7 @@
                         '七','八','九','十','十一','十二'][month - 1];
 
                     var intercalaryMonth = this.intercalaryMonth(year);
-                    if (monthIndex === intercalaryMonth) {
+                    if (intercalaryMonth && monthIndex === intercalaryMonth) {
                         monthName = '闰' + monthName;
                     }
 
