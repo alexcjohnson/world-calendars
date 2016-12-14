@@ -243,7 +243,6 @@
         /** Determine the intercalary month of a year (if any).
             @memberof ChineseCalendar
             @param year {CDate|number} The date to examine or the year to examine.
-            @param [monthIndex] {number} The month index to examine.
             @return {number} The intercalary month number, or 0 if none.
             @throws Error if an invalid year or a different calendar used. */
         intercalaryMonth: function(year) {
@@ -253,6 +252,23 @@
             var intercalaryMonth = monthDaysTable >> 13;
 
             return intercalaryMonth;
+        },
+
+        /** Determine whether this date is an intercalary month.
+            @memberof ChineseCalendar
+            @param year {CDate|number} The date to examine or the year to examine.
+            @param [monthIndex] {number} The month index to examine.
+            @return {boolean} <code>true</code> if this is an intercalary month, <code>false</code> if not.
+            @throws Error if an invalid year or a different calendar used. */
+        isIntercalaryMonth: function(year, monthIndex) {
+            if (year.year) {
+                year = year.year();
+                monthIndex = year.month();
+            }
+
+            var intercalaryMonth = this.intercalaryMonth(year);
+
+            return !!intercalaryMonth && intercalaryMonth === monthIndex;
         },
 
         /** Determine whether this date is in a leap year.
